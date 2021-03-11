@@ -18,6 +18,7 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3 :: Only',
+        'Programming Language :: Python :: 3.10',
     ],
     platforms='any',
     include_package_data=True,
