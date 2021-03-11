@@ -9,136 +9,236 @@ from collections import OrderedDict
 
 class ControlCode:
     def __init__(self, *args):
-        self.args = args
+        self._args = args
 
-    # TODO: Subclass hook check for required class-level attributes
     # TODO: Register subclasses in lookup dict or something.
+
+    @property
+    def args(self):
+        return self._args
+
+    def __repr__(self):
+        return f"{type(self)}(args={self.args})"
 
 
 class FixedSignatureControlCode(ControlCode):
     def __init__(self, *args):
         if len(args) != len(self.signature):
-            raise TypeError(f"{type(self)} requires {len(self.signature)} arguments")
+            raise TypeError(
+                f"{type(self)} requires {len(self.signature)} arguments")
 
-        self.args = args
+        super().__init__(*args)
 
 
 class CursorUp(FixedSignatureControlCode):
-    description = "Move cursor up by n"
-    signature = OrderedDict(n=1)
     code = "A"
+    signature = OrderedDict(n=1)
+
+    def __str__(self):
+        return f"Move cursor up by {self.args[0]}"
 
 
 class CursorDown(FixedSignatureControlCode):
-    description = "Move cursor down by n"
-    signature = OrderedDict(n=1)
     code = "B"
+    signature = OrderedDict(n=1)
+
+    def __str__(self):
+        return f"Move cursor down by {self.args[0]}"
 
 
 class CursorForward(FixedSignatureControlCode):
-    description = "Move cursor forward by n"
-    signature = OrderedDict(n=1)
     code = "C"
+    signature = OrderedDict(n=1)
+
+    def __str__(self):
+        return f"Move cursor forward by {self.args[0]}"
 
 
 class CursorBack(FixedSignatureControlCode):
-    signature = OrderedDict(n=1)
-    description = "Move cursor back by n"
     code = "D"
+    signature = OrderedDict(n=1)
+
+    def __str__(self):
+        return f"Move cursor back by {self.args[0]}"
 
 
 class CursorNextLine(FixedSignatureControlCode):
-    signature = OrderedDict(n=1)
-    description = "Move cursor to the beginning of the line n lines down"
     code = "E"
+    signature = OrderedDict(n=1)
+
+    def __str__(self):
+        return f"Move cursor to the beginning of the line {self.args[0]} lines down"
 
 
 class CursorPreviousLine(FixedSignatureControlCode):
-    signature = OrderedDict(n=1)
-    description = "Move cursor to the beginning of the line n lines up"
     code = "F"
+    signature = OrderedDict(n=1)
+
+    def __str__(self):
+        return f"Move cursor to the beginning of the line {self.args[0]} lines up"
 
 
 class CursorHorizontalAbsolute(FixedSignatureControlCode):
-    signature = OrderedDict(n=1)
-    description = "Move cursor to the the column n within the current row"
     code = "G"
+    signature = OrderedDict(n=1)
+
+    def __str__(self):
+        return f"Move cursor to the the column {self.args[0]} within the current row"
 
 
 class CursorPosition(FixedSignatureControlCode):
-    signature = OrderedDict(n=1, m=1)
-    description = "Move cursor to row n, column m, counting from the top left corner"
     code = "H"
+    signature = OrderedDict(n=1, m=1)
+
+    def __str__(self):
+        return f"Move cursor to row {self.args[0]}, column {self.args[1]}, counting from the top left corner"
 
 
 class EraseInDisplay(FixedSignatureControlCode):
-    signature = OrderedDict(n=0)
-    description = (
-        "Clear part of the screen. 0, 1, 2, and 3 have various specific functions"
-    )
     code = "J"
+    signature = OrderedDict(n=0)
+
+    def __str__(self):
+        # TODO: What are these "specific functions?"
+        return (
+            "Clear part of the screen. 0, 1, 2, and 3 have various specific functions"
+        )
 
 
 class EraseinLine(FixedSignatureControlCode):
-    signature = OrderedDict(n=0)
-    description = "Clear part of the line. 0, 1, and 2 have various specific functions"
     code = "K"
+    signature = OrderedDict(n=0)
+
+    def __str__(self):
+        # TODO: What are these "specific functions?"
+        return "Clear part of the line. 0, 1, and 2 have various specific functions"
 
 
 class ScrollUp(FixedSignatureControlCode):
-    signature = OrderedDict(n=1)
-    description = "Scroll window up by n lines"
     code = "S"
+    signature = OrderedDict(n=1)
+
+    def __str__(self):
+        return f"Scroll window up by {self.args[0]} lines"
 
 
 class ScrollDown(FixedSignatureControlCode):
-    signature = OrderedDict(n=1)
-    description = "Scroll window down by n lines"
     code = "T"
+    signature = OrderedDict(n=1)
+
+    def __str__(self):
+        return f"Scroll window down by {self.args[0]} lines"
 
 
 class SaveCursorPosition(FixedSignatureControlCode):
-    signature = {}
-    description = "Save current cursor position for use with u"
     code = "s"
+    signature = {}
+
+    def __str__(self):
+        return "Save current cursor position for use with u"
 
 
 class RestoreCursorPosition(FixedSignatureControlCode):
-    signature = {}
-    description = "Set cursor back to position last saved by s"
     code = "u"
+    signature = {}
+
+    def __str__(self):
+        return "Set cursor back to position last saved by s"
 
 
 class CursorHorizontalAbsoluteAlt(FixedSignatureControlCode):
-    signature = OrderedDict(n=1)
-    description = "Move cursor to the the column n within the current row"
     code = "f"
+    signature = OrderedDict(n=1)
+
+    def __str__(self):
+        return f"Move cursor to the the column {self.args[0]} within the current row"
 
 
-# m 	SGR 	(*) 	Set graphics mode. More below
-# 0 	Reset: turn off all attributes
-# 1 	Bold (or bright, it’s up to the terminal and the user config to some extent)
-# 3 	Italic
-# 4 	Underline
-# 30–37 	Set text colour from the basic colour palette of 0–7
-# 38;5;n 	Set text colour to index n in a 256-colour palette (e.g. \x1b[38;5;34m)
-# 38;2;r;g;b 	Set text colour to an RGB value (e.g. \x1b[38;2;255;255;0m)
-# 40–47 	Set background colour
-# 48;5;n 	Set background colour to index n in a 256-colour palette
-# 48;2;r;g;b 	Set background colour to an RGB value
-# 90–97 	Set text colour from the bright colour palette of 0–7
-# 100–107 	Set background colour from the bright colour palette of 0–7
+class SetGraphicsMode(ControlCode):
+    code = "m"
+    description = "Set graphics mode"
 
-# The basic colour palette has 8 entries:
-#     0: black
-#     1: red
-#     2: green
-#     3: yellow
-#     4: blue
-#     5: magenta
-#     6: cyan
-#     7: white
+    def __init__(self, *args):
+        if len(args) not in (1, 3, 5):
+            raise TypeError(
+                f"SGM only accepts 1, 3, or 5 arguments. Received {args}.")
+
+        self._description = self._args_to_description(args)
+
+    def __str__(self):
+        return f'Set graphics mode: {self._description}'
+
+    @staticmethod
+    def _args_to_description(args):
+        match args:
+            case(0,):
+                return 'Reset: turn off all attributes'
+
+            case(1,):
+                return 'Bold / bright'
+
+            case(3,):
+                return 'Italic'
+
+            case(4,):
+                return 'Underline'
+
+            case(x,) if 30 <= x <= 37:
+                color_id = x - 30
+                color_name = SetGraphicsMode._basic_color(color_id)
+                return f"Set text color to {color_name}"
+
+            case(38, 5, n):
+                # TODO: SHould we be guarding against n not in 0-255?
+                return f'Set text color to palette color {n}'
+
+            case(38, 2, r, g, b):
+                # TODO: Should we be guarding against r,b,g not in 0-255?
+                return f'Set text color to R={r} G={g} B={b}'
+
+            case(x,) if 40 <= x <= 47:
+                color_id = x - 40
+                color_name = SetGraphicsMode._basic_color(color_id)
+                return f"Set background color to {color_name}"
+
+            case(48, 5, n):
+                # TODO: SHould we be guarding against n not in 0-255?
+                return f'Set background color to palette color {n}'
+
+            case(48, 2, r, g, b):
+                # TODO: Should we be guarding against r,b,g not in 0-255?
+                return f'Set background color to R={r} G={g} B={b}'
+
+            case(x,) if 90 <= x <= 97:
+                color_id = x - 90
+                color_name = SetGraphicsMode._basic_color(color_id)
+                return f"Set text color to {color_name} from the bright color palette"
+
+            case(x,) if 100 <= x <= 107:
+                color_id = x - 100
+                color_name = SetGraphicsMode._basic_color(color_id)
+                return f"Set background color to {color_name} from the bright color palette"
+
+    @staticmethod
+    def _basic_color(color_id):
+        return {
+            0: "black",
+            1: "red",
+            2: "green",
+            3: "yellow",
+            4: "blue",
+            5: "magenta",
+            6: "cyan",
+            7: "white",
+        }[color_id]
 
 # Another pair of useful escapes is \x1b[?25h and \x1b[?25l. These show and hide the cursor, respectively.
 
 # One other thing that we use frequently is \r, or Carriage Return, which is functionally similar or identical to \x1b[1G
+
+
+def get_control_code(code, args):
+    if code == SetGraphicsMode.code:
+        return SetGraphicsMode(*args)
+
+    raise ValueError(f'Unrecognized control code: {code}')
