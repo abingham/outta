@@ -24,14 +24,17 @@ setup(
     include_package_data=True,
     package_dir={'': 'source'},
     # package_data={'outta': . . .},
-    install_requires=[],
+    install_requires=[
+        'click',
+        'lark',
+    ],
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax, for
     # example: $ pip install -e .[dev,test]
     extras_require={
         'dev': ['black', 'bump2version'],
         # 'doc': ['sphinx', 'cartouche'],
-        'test': ['hypothesis', 'pytest'],
+        'test': ['pytest'],
     },
     entry_points={
         # 'console_scripts': [
