@@ -104,7 +104,7 @@ class Parser:
         self._parser = None
         self._initialize_parser()
 
-    def feed(self, data):
+    def feed(self, data) -> elements.Element:
         """Consume some data and advances the state as necessary.
 
         :param str data: a blob of data to feed from.
