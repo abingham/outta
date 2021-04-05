@@ -16,46 +16,10 @@ class ExplainerScreen:
     def reset(self):
         return "Reset the terminal to its initial state"
 
-    # def resize(self, lines=None, columns=None):
-    #     """Resize the screen to the given size.
-
-    #     If the requested screen size has more lines than the existing
-    #     screen, lines will be added at the bottom. If the requested
-    #     size has less lines than the existing screen lines will be
-    #     clipped at the top of the screen. Similarly, if the existing
-    #     screen has less columns than the requested screen, columns will
-    #     be added at the right, and if it has more -- columns will be
-    #     clipped at the right.
-
-    #     :param int lines: number of lines in the new screen.
-    #     :param int columns: number of columns in the new screen.
-
-    #     .. versionchanged:: 0.7.0
-
-    #        If the requested screen size is identical to the current screen
-    #        size, the method does nothing.
-    #     """
-    #     lines = lines or self.lines
-    #     columns = columns or self.columns
-
-    #     if lines == self.lines and columns == self.columns:
-    #         return  # No changes.
-
-    #     self.dirty.update(range(lines))
-
-    #     if lines < self.lines:
-    #         self.save_cursor()
-    #         self.cursor_position(0, 0)
-    #         self.delete_lines(self.lines - lines)  # Drop from the top.
-    #         self.restore_cursor()
-
-    #     if columns < self.columns:
-    #         for line in self.buffer.values():
-    #             for x in range(columns, self.columns):
-    #                 line.pop(x, None)
-
-    #     self.lines, self.columns = lines, columns
-    #     self.set_margins()
+    @standard
+    def resize(self, lines=None, columns=None):
+        # If lines or columns is None, it means to not change that dimension. If neither change, this is a noop.
+        return f"Resize screen to {lines} lines and {columns} columns"
 
     @standard
     def set_margins(self, top=None, bottom=None):
@@ -265,4 +229,4 @@ class ExplainerScreen:
 
     @standard
     def debug(self, *args, **kwargs):
-        return r"Unrecognized escape sequence. Args={args}, Keyword args={kwargs}"
+        return f"Unrecognized escape sequence. Args={args}, Keyword args={kwargs}"
