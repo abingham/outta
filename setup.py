@@ -25,8 +25,9 @@ setup(
     # package_data={'outta': . . .},
     install_requires=[
         "click",
-        "lark",
         "pyte",
+        "fastapi",
+        "pydantic",
     ],
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax, for
