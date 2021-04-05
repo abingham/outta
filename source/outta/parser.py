@@ -13,11 +13,13 @@ These are the copyrights for the pyte work:
 
 from __future__ import absolute_import, unicode_literals
 
-import itertools
 import re
 from collections import defaultdict
 
-from pyte import control as ctrl, escape as esc
+from pyte import control as ctrl
+from pyte import escape as esc
+
+from . import elements
 
 
 class Parser:
@@ -30,76 +32,63 @@ class Parser:
 
     #: Control sequences, which don't require any arguments.
     basic = {
-        ctrl.BEL: "bell",
-        ctrl.BS: "backspace",
-        ctrl.HT: "tab",
-        ctrl.LF: "linefeed",
-        ctrl.VT: "linefeed",
-        ctrl.FF: "linefeed",
-        ctrl.CR: "carriage_return",
-        ctrl.SO: "shift_out",
-        ctrl.SI: "shift_in",
+        ctrl.BEL: elements.Bell,
+        ctrl.BS: elements.Backspace,
+        ctrl.HT: elements.Tab,
+        ctrl.LF: elements.LineFeed,
+        ctrl.VT: elements.LineFeed,
+        ctrl.FF: elements.LineFeed,
+        ctrl.CR: elements.CarriageReturn,
+        ctrl.SO: elements.Shiftout,
+        ctrl.SI: elements.ShiftIn,
     }
 
     #: non-CSI escape sequences.
     escape = {
-        esc.RIS: "reset",
-        esc.IND: "index",
-        esc.NEL: "linefeed",
-        esc.RI: "reverse_index",
-        esc.HTS: "set_tab_stop",
-        esc.DECSC: "save_cursor",
-        esc.DECRC: "restore_cursor",
+        esc.RIS: elements.Reset,
+        esc.IND: elements.Index,
+        esc.NEL: elements.LineFeed,
+        esc.RI: elements.ReverseIndex,
+        esc.HTS: elements.SetTabStop,
+        esc.DECSC: elements.SaveCursor,
+        esc.DECRC: elements.RestoreCursor,
     }
 
     #: "sharp" escape sequences -- ``ESC # <N>``.
     sharp = {
-        esc.DECALN: "alignment_display",
+        esc.DECALN: elements.AlignmentDisplay,
     }
 
     #: CSI escape sequences -- ``CSI P1;P2;...;Pn <fn>``.
     csi = {
-        esc.ICH: "insert_characters",
-        esc.CUU: "cursor_up",
-        esc.CUD: "cursor_down",
-        esc.CUF: "cursor_forward",
-        esc.CUB: "cursor_back",
-        esc.CNL: "cursor_down1",
-        esc.CPL: "cursor_up1",
-        esc.CHA: "cursor_to_column",
-        esc.CUP: "cursor_position",
-        esc.ED: "erase_in_display",
-        esc.EL: "erase_in_line",
-        esc.IL: "insert_lines",
-        esc.DL: "delete_lines",
-        esc.DCH: "delete_characters",
-        esc.ECH: "erase_characters",
-        esc.HPR: "cursor_forward",
-        esc.DA: "report_device_attributes",
-        esc.VPA: "cursor_to_line",
-        esc.VPR: "cursor_down",
-        esc.HVP: "cursor_position",
-        esc.TBC: "clear_tab_stop",
-        esc.SM: "set_mode",
-        esc.RM: "reset_mode",
-        esc.SGR: "select_graphic_rendition",
-        esc.DSR: "report_device_status",
-        esc.DECSTBM: "set_margins",
-        esc.HPA: "cursor_to_column",
+        esc.ICH: elements.InsertCharacters,
+        esc.CUU: elements.CursorUp,
+        esc.CUD: elements.CursorDown,
+        esc.CUF: elements.CursorForward,
+        esc.CUB: elements.CursorBack,
+        esc.CNL: elements.CursorDown1,
+        esc.CPL: elements.CursorUp1,
+        esc.CHA: elements.CursorToColumn,
+        esc.CUP: elements.CursorPosition,
+        esc.ED: elements.EraseInDisplay,
+        esc.EL: elements.EraseInLine,
+        esc.IL: elements.InsertLines,
+        esc.DL: elements.DeleteLines,
+        esc.DCH: elements.DeleteCharacters,
+        esc.ECH: elements.EraseCharacters,
+        esc.HPR: elements.CursorForward,
+        esc.DA: elements.ReportDeviceAttributes,
+        esc.VPA: elements.CursorToLine,
+        esc.VPR: elements.CursorDown,
+        esc.HVP: elements.CursorPosition,
+        esc.TBC: elements.ClearTabStop,
+        esc.SM: elements.SetMode,
+        esc.RM: elements.ResetMode,
+        esc.SGR: elements.SelectGraphicRendition,
+        esc.DSR: elements.ReportDeviceStatus,
+        esc.DECSTBM: elements.SetMargins,
+        esc.HPA: elements.CursorToColumn,
     }
-
-    #: A set of all events dispatched by the stream.
-    events = frozenset(
-        itertools.chain(
-            basic.values(),
-            escape.values(),
-            sharp.values(),
-            csi.values(),
-            ["define_charset"],
-            ["set_icon_name", "set_title"],  # OSC.
-            ["draw", "debug"],
-        )
-    )
 
     #: A regular expression pattern matching everything what can be
     #: considered plain text.
@@ -120,7 +109,7 @@ class Parser:
 
         :param str data: a blob of data to feed from.
 
-        Returns: An iterable of (token, params, keywords, text).
+        Returns: An iterable of Element's.
         """
         length = len(data)
         offset = 0
@@ -129,14 +118,14 @@ class Parser:
                 match = self._text_pattern.match(data, offset)
                 if match:
                     start, offset = match.span()
-                    yield "text", (), {}, data[start:offset]
+                    yield elements.Text((), {}, data[start:offset])
                 else:
                     self._taking_plain_text = False
                     self._buffer = ""
             else:
                 self._buffer += data[offset]
                 if (result := self._send_to_parser(data[offset])) is not None:
-                    yield result + (self._buffer,)
+                    yield result[0](result[1], result[2], self._buffer)
                     self._taking_plain_text = True
                 offset += 1
 
@@ -151,6 +140,7 @@ class Parser:
 
     def _initialize_parser(self):
         self._buffer = ""
+        self._taking_plain_text = True
         self._parser = self._parser_fsm()
         next(self._parser)
 
@@ -183,8 +173,6 @@ class Parser:
         sharp_dispatch = create_dispatcher(self.sharp)
         escape_dispatch = create_dispatcher(self.escape)
         csi_dispatch = create_dispatcher(self.csi)
-
-        self._taking_plain_text = True
 
         sequence_buffer = ""
         result = None
@@ -266,7 +254,7 @@ class Parser:
                         # current sequence is aborted; terminal displays
                         # the substitute character, followed by characters
                         # in the sequence received after CAN or SUB.
-                        result = "text", (char,), {}
+                        result = ElementID.Text, (char,), {}
                         break
                     elif char.isdigit():
                         current += char
