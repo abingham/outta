@@ -26,6 +26,13 @@ class Element:
             return self.keywords[str]
         return self.parameters[index]
 
+    def _description(self):
+        return f"{type(self).__name__}({self.parameters}, {self.keywords})"
+
+    @property
+    def description(self):
+        return self._description()
+
 
 class AlignmentDisplay(Element):
     pass
@@ -52,7 +59,12 @@ class CursorBack(Element):
 
 
 class CursorDown(Element):
-    pass
+    @property
+    def count(self):
+        return self[0]
+
+    def _description(self):
+        return f"Move cursor down {self.count} rows"
 
 
 class CursorDown1(Element):
@@ -79,6 +91,9 @@ class CursorUp(Element):
     @property
     def count(self):
         return self[0]
+
+    def _description(self):
+        return f"Move cursor up {self.count} rows"
 
 
 class CursorUp1(Element):
@@ -213,4 +228,5 @@ class Tab(Element):
 
 
 class Text(Element):
-    pass
+    def _description(self):
+        return "Text"

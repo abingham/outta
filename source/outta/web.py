@@ -2,8 +2,17 @@ from typing import List
 from fastapi import FastAPI
 from pydantic import BaseModel
 from outta.parser import Parser
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class TranslationRequest(BaseModel):
@@ -16,9 +25,9 @@ class Element(BaseModel):
 
 
 @app.get("/", response_model=List[Element])
-async def root(request: TranslationRequest):
+async def root(text: str):
     parser = Parser()
     return [
-        Element(description=str(element), text=element.text)
-        for element in parser.feed(request.text)
+        Element(description=element.description, text=element.text)
+        for element in parser.feed(text)
     ]

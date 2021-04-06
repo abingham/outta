@@ -1,3 +1,4 @@
+*.code-workspace
 elm-stuff
 .vscode
 build
