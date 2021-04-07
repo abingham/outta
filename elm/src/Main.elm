@@ -1,5 +1,12 @@
 module Main exposing (Msg(..), main, update, view)
 
+import Bootstrap.Button as Button
+import Bootstrap.CDN as CDN
+import Bootstrap.Form as Form
+import Bootstrap.Form.Input as Input
+import Bootstrap.Form.InputGroup as InputGroup
+import Bootstrap.Grid as Grid
+import Bootstrap.Table as Table
 import Browser
 import Html exposing (Html, button, div, input, table, td, text, tr)
 import Html.Events exposing (onClick, onInput)
@@ -109,19 +116,47 @@ update msg model =
             ( { model | response = [ Element "error" (errorToString err) ] }, Cmd.none )
 
 
-view : Model -> Html.Html Msg
-view model =
+mainContent : Model -> Html.Html Msg
+mainContent model =
     let
         rows =
-            List.map (\e -> tr [] [ td [] [ text e.description ], td [] [ text e.text ] ]) model.response
+            List.map
+                (\e ->
+                    Table.tr [ Table.rowInfo ]
+                        [ Table.td [] [ text e.text ]
+                        , Table.td [] [ text e.description ]
+                        ]
+                )
+                model.response
 
         responseTable =
-            table [] rows
+            Table.simpleTable
+                ( Table.simpleThead
+                    [ Table.th [] [ text "Text" ]
+                    , Table.th [] [ text "Description" ]
+                    ]
+                , Table.tbody [] rows
+                )
     in
     div []
-        [ input [ onInput InputTextChanged ] []
-        , button [ onClick TranslationRequested ] [ text "Translate" ]
+        [ InputGroup.config
+            (InputGroup.text [ Input.onInput InputTextChanged ])
+            |> InputGroup.large
+            |> InputGroup.successors
+                [ InputGroup.button [ Button.primary, Button.onClick TranslationRequested ] [ text "Translate" ] ]
+            |> InputGroup.view
         , responseTable
+        ]
+
+
+view : Model -> Html Msg
+view model =
+    Grid.container []
+        -- Responsive fixed width container
+        [ CDN.stylesheet -- Inlined Bootstrap CSS for use with reactor
+
+        -- , navbar model -- Interactive and responsive menu
+        , mainContent model
         ]
 
 
