@@ -140,7 +140,7 @@ mainContent model =
     in
     div []
         [ InputGroup.config
-            (InputGroup.text [ Input.onInput InputTextChanged, Input.value model.text ])
+            (InputGroup.text [ Input.onInput InputTextChanged, Input.value model.text, Input.placeholder "Enter text containing control codes for translation..." ])
             |> InputGroup.large
             |> InputGroup.successors
                 [ InputGroup.button [ Button.primary, Button.onClick TranslationRequested ] [ text "Translate" ] ]
