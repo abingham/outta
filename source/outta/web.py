@@ -28,6 +28,6 @@ class Element(BaseModel):
 async def root(text: str):
     parser = Parser()
     return [
-        Element(description=element.description, text=element.text)
+        Element(description=str(element), text=repr(element.text)[1:-1])
         for element in parser.feed(text)
     ]

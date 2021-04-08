@@ -26,12 +26,8 @@ class Element:
             return self.keywords[str]
         return self.parameters[index]
 
-    def _description(self):
-        return f"{type(self).__name__}({self.parameters}, {self.keywords})"
-
-    @property
-    def description(self):
-        return self._description()
+    def __repr__(self):
+        return f"{type(self).__name__}(parameters={self.parameters}, keywords={self.keywords}, text={repr(self.text)})"
 
 
 class AlignmentDisplay(Element):
@@ -63,7 +59,7 @@ class CursorDown(Element):
     def count(self):
         return self[0]
 
-    def _description(self):
+    def __str__(self):
         return f"Move cursor down {self.count} rows"
 
 
@@ -92,7 +88,7 @@ class CursorUp(Element):
     def count(self):
         return self[0]
 
-    def _description(self):
+    def __str__(self):
         return f"Move cursor up {self.count} rows"
 
 
@@ -101,7 +97,8 @@ class CursorUp1(Element):
 
 
 class Debug(Element):
-    pass
+    def __str__(self):
+        return f"Invalid control character: {repr(self.text)}"
 
 
 class DefineCharset(Element):
@@ -228,5 +225,5 @@ class Tab(Element):
 
 
 class Text(Element):
-    def _description(self):
-        return "Text"
+    def __str__(self):
+        return self.text
