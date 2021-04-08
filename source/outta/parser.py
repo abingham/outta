@@ -167,7 +167,7 @@ class Parser:
         OSC_TERMINATORS = set([ctrl.ST_C0, ctrl.ST_C1, ctrl.BEL])
 
         def create_dispatcher(mapping):
-            return defaultdict(lambda: "debug", mapping)
+            return defaultdict(lambda: elements.Debug, mapping)
 
         basic_dispatch = create_dispatcher(basic)
         sharp_dispatch = create_dispatcher(self.sharp)
