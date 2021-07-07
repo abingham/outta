@@ -254,7 +254,7 @@ class Parser:
                         # current sequence is aborted; terminal displays
                         # the substitute character, followed by characters
                         # in the sequence received after CAN or SUB.
-                        result = ElementID.Text, (char,), {}
+                        result = elements.Text, (char,), {}
                         break
                     elif char.isdigit():
                         current += char
