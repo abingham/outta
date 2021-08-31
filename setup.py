@@ -9,7 +9,7 @@ setup(
     author="Austin Bingham",
     author_email="austin.bingham@protonmail.com",
     description="ANSI control code parsing",
-    license="MIT",
+    license="LGPL",
     keywords="",
     url="http://github.com/abingham/outta",
     classifiers=[
