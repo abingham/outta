@@ -23,7 +23,7 @@ from . import elements
 
 
 class Parser:
-    """A stream is a state machine that parses a stream of bytes and
+    """A stream is a state machine that parses a stream of text (str) and
     dispatches events based on what it sees.
 
     :param bool strict: check if a given screen implements all required
@@ -39,7 +39,7 @@ class Parser:
         ctrl.VT: elements.LineFeed,
         ctrl.FF: elements.LineFeed,
         ctrl.CR: elements.CarriageReturn,
-        ctrl.SO: elements.Shiftout,
+        ctrl.SO: elements.ShiftOut,
         ctrl.SI: elements.ShiftIn,
     }
 
