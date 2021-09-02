@@ -1,6 +1,0 @@
-% python docs/example.py
-> CursorForward(parameters=(4,), keywords={}, text='\x1b[4C')
-> Out of
-> CursorBack(parameters=(3,), keywords={}, text='\x1b[3D')
-> ta control!
-    Outta control!
