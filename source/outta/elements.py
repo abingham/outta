@@ -18,9 +18,7 @@ class Element:
         text: The text parsed to create the Element (i.e. the control sequence).
     """
 
-    def __init__(
-        self, parameters: Iterable[Any], keywords: Mapping[str, Any], text: str
-    ):
+    def __init__(self, parameters: Iterable[Any], keywords: Mapping[str, Any], text: str):
         self._parameters = tuple(parameters)
         self._keywords = dict(keywords)
         self._text = text
@@ -62,11 +60,7 @@ class Element:
         return f"{type(self).__name__}(parameters={self.parameters}, keywords={self.keywords}, text={repr(self.text)})"
 
     def __eq__(self, rhs):
-        return (
-            (self._parameters == rhs._parameters)
-            and (self._keywords == rhs._keywords)
-            and (self._text == rhs._text)
-        )
+        return (self._parameters == rhs._parameters) and (self._keywords == rhs._keywords) and (self._text == rhs._text)
 
 
 # TODO: Add any appropriate methods to the classes below. See CursorDown as an example.

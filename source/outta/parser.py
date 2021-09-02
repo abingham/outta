@@ -24,15 +24,15 @@ from . import elements
 
 
 class Parser:
-    """Parses a stream of text and produces a sequence of ``Element``\s.
+    """Parses a stream of text and produces a sequence of ``Element``s.
 
     This sequence is an representation of the control sequences, escape codes,
     and regular text it finds. It can be used, for example, to drive a terminal
     implementation, for debugging or understanding control sequences, or
     any number of other purposes.
 
-    :param bool strict: check if a given screen implements all required
-                        events.
+    Args:
+        strict: check if a given screen implements all required events.
     """
 
     #: Control sequences, which don't require any arguments.
@@ -181,9 +181,7 @@ class Parser:
         SP_OR_GT = ctrl.SP + ">"
         NUL_OR_DEL = ctrl.NUL + ctrl.DEL
         CAN_OR_SUB = ctrl.CAN + ctrl.SUB
-        ALLOWED_IN_CSI = "".join(
-            [ctrl.BEL, ctrl.BS, ctrl.HT, ctrl.LF, ctrl.VT, ctrl.FF, ctrl.CR]
-        )
+        ALLOWED_IN_CSI = "".join([ctrl.BEL, ctrl.BS, ctrl.HT, ctrl.LF, ctrl.VT, ctrl.FF, ctrl.CR])
         OSC_TERMINATORS = set([ctrl.ST_C0, ctrl.ST_C1, ctrl.BEL])
 
         def create_dispatcher(mapping):
