@@ -15,6 +15,7 @@ from __future__ import absolute_import, unicode_literals
 
 import re
 from collections import defaultdict
+from typing import Iterable
 
 from pyte import control as ctrl
 from pyte import escape as esc
@@ -23,8 +24,12 @@ from . import elements
 
 
 class Parser:
-    """A stream is a state machine that parses a stream of text (str) and
-    dispatches events based on what it sees.
+    """Parses a stream of text and produces a sequence of ``Element``\s.
+
+    This sequence is an representation of the control sequences, escape codes,
+    and regular text it finds. It can be used, for example, to drive a terminal
+    implementation, for debugging or understanding control sequences, or
+    any number of other purposes.
 
     :param bool strict: check if a given screen implements all required
                         events.
@@ -104,12 +109,27 @@ class Parser:
         self._parser = None
         self._initialize_parser()
 
-    def feed(self, data) -> elements.Element:
+    @property
+    def use_utf8(self) -> bool:
+        """Whether to operate in "utf8" mode.
+
+        See http://www.cl.cam.ac.uk/~mgk25/unicode.html#term for more details
+        on what this means and how utf8 relates to terminal emulators.
+        """
+        return self._use_utf8
+
+    @use_utf8.setter
+    def use_utf8(self, flag: bool):
+        self._use_utf8 = flag
+
+    def feed(self, data: str) -> Iterable[elements.Element]:
         """Consume some data and advances the state as necessary.
 
-        :param str data: a blob of data to feed from.
+        Args:
+            data: a blob of data to feed from.
 
-        Returns: An iterable of Element's.
+        Returns:
+            An iterable of Element's.
         """
         length = len(data)
         offset = 0
@@ -299,21 +319,21 @@ class Parser:
             elif char not in NUL_OR_DEL:
                 result = None, char, {}
 
-    def select_other_charset(self, code):
-        """Select other (non G0 or G1) charset.
+    # def select_other_charset(self, code):
+    #     """Select other (non G0 or G1) charset.
 
-        :param str code: character set code, should be a character from
-                         ``"@G8"``, otherwise ignored.
+    #     :param str code: character set code, should be a character from
+    #                      ``"@G8"``, otherwise ignored.
 
-        .. note:: We currently follow ``"linux"`` and only use this
-                  command to switch from ISO-8859-1 to UTF-8 and back.
+    #     .. note:: We currently follow ``"linux"`` and only use this
+    #               command to switch from ISO-8859-1 to UTF-8 and back.
 
-        .. versionadded:: 0.6.0
+    #     .. versionadded:: 0.6.0
 
-        .. seealso::
+    #     .. seealso::
 
-           `Standard ECMA-35, Section 15.4 \
-           <http://ecma-international.org/publications/standards/Ecma-035.htm>`_
-           for a description of VTXXX character set machinery.
-        """
-        # A noop since all input is Unicode-only.
+    #        `Standard ECMA-35, Section 15.4 \
+    #        <http://ecma-international.org/publications/standards/Ecma-035.htm>`_
+    #        for a description of VTXXX character set machinery.
+    #     """
+    #     # A noop since all input is Unicode-only.

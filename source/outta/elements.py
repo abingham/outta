@@ -1,7 +1,23 @@
+"""Intermediate representation of the control codes outta recognizes.
+
+One of outta's primary jobs is parsing text streams into sequences of objects representing the control codes it sees,
+i.e. the intermediate representation. This module provides the classes that comprise that IR.
+
+For each control sequence outta recognizes, this has a class which contains its parsed contents.
+"""
+
 from typing import Iterable, Mapping, Any
 
 
 class Element:
+    """Base class for all control code intermediate representations.
+
+    Args:
+        parameters: Iterable of positional arguments to the Element.
+        keywords: Dict-like of keyword arguments to the Element.
+        text: The text parsed to create the Element (i.e. the control sequence).
+    """
+
     def __init__(
         self, parameters: Iterable[Any], keywords: Mapping[str, Any], text: str
     ):
@@ -11,17 +27,33 @@ class Element:
 
     @property
     def text(self):
+        "The text that was parsed to produce the Element."
         return self._text
 
     @property
     def keywords(self):
+        "Keyword arguments provided to the Element."
         return self._keywords
 
     @property
     def parameters(self):
+        "Positional arguments provided to the Element."
         return self._parameters
 
     def __getitem__(self, index):
+        """Get a positional or keyword argument by index or name.
+
+        Args:
+            index: If a string, the name of the keyword argument to retrieve. If an integer, the index
+                of the positional argument to retrieve.
+
+        Returns:
+            The specified keyword or positional argument.
+
+        Raises:
+            IndexError: The integer index is out of bounds.
+            KeyError: The string key does not exist in the keywords.
+        """
         if isinstance(index, str):
             return self.keywords[str]
         return self.parameters[index]
@@ -37,12 +69,19 @@ class Element:
         )
 
 
+# TODO: Add any appropriate methods to the classes below. See CursorDown as an example.
+# In particular, __str__ should produce a natural language description of what the
+# Element does. This is used for producing human-readable descriptions of what a sequence
+# text does.
+
+
 class AlignmentDisplay(Element):
     pass
 
 
 class Backspace(Element):
-    pass
+    def __str__(self):
+        return "Move cursor back one column"
 
 
 class Bell(Element):
