@@ -144,7 +144,8 @@ class Parser:
                     self._buffer = ""
             else:
                 self._buffer += data[offset]
-                if (result := self._send_to_parser(data[offset])) is not None:
+                result = self._send_to_parser(data[offset])
+                if result is not None:
                     yield result[0](result[1], result[2], self._buffer)
                     self._taking_plain_text = True
                 offset += 1
