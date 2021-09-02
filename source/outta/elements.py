@@ -29,6 +29,13 @@ class Element:
     def __repr__(self):
         return f"{type(self).__name__}(parameters={self.parameters}, keywords={self.keywords}, text={repr(self.text)})"
 
+    def __eq__(self, rhs):
+        return (
+            (self._parameters == rhs._parameters)
+            and (self._keywords == rhs._keywords)
+            and (self._text == rhs._text)
+        )
+
 
 class AlignmentDisplay(Element):
     pass
@@ -216,7 +223,7 @@ class ShiftIn(Element):
     pass
 
 
-class Shiftout(Element):
+class ShiftOut(Element):
     pass
 
 
