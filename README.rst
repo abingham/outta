@@ -12,8 +12,7 @@ text) were in it.
 
 Here's a quick example:
 
-.. code-block::
-  :language: python
+.. code-block:: python
 
   from outta.parser import Parser
 
@@ -26,7 +25,7 @@ Here's a quick example:
   
   # Print each of the elements
   for element in elements:
-  print(">", element)
+      print(">", element)
   
   # Reconstruct the input text from the elements and print it
   full_text = "".join(e.text for e in elements)
