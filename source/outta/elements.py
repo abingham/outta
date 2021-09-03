@@ -252,6 +252,10 @@ class SetTitle(Element):
         return self["title"]
 
 
+class SetTitleAndIconName(SetIconName, SetTitle):
+    pass
+
+
 class ShiftIn(Element):
     pass
 

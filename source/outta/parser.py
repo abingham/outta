@@ -311,12 +311,14 @@ class Parser:
                         param += char
 
                 param = param[1:]  # Drop the ;.
-                if code in "01":
-                    result = "set_icon_name", (), {"name": param}
-                if code in "02":
-                    result = "set_title", (), {"title": param}
+                if code == "0":
+                    yield elements.SetTitleAndIconName, (), {"name": param, "title": param}
+                elif code == "1":
+                    yield elements.SetIconName, (), {"name": param}
+                elif code == "2":
+                    yield elements.SetTitle, (), {"title": param}
             elif char not in NUL_OR_DEL:
-                result = None, char, {}
+                result = elements.Text, char, {}
 
     # def select_other_charset(self, code):
     #     """Select other (non G0 or G1) charset.
