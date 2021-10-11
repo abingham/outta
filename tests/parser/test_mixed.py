@@ -6,7 +6,8 @@
 import pyte.control as ctrl
 import pyte.escape as esc
 import pytest
-from outta.elements import CursorDown, CursorPosition, LineFeed, Text
+from outta.elements import (CursorDown, CursorPosition, LineFeed, SetIconName,
+                            SetMode, SetTitle, SetTitleAndIconName, Text)
 from outta.parser import Parser
 
 
@@ -30,6 +31,22 @@ CORPUS = (
             CursorPosition((3, 4), {}, _csi(esc.CUP, 3, 4)),
         ],
     ),
+    (
+        # This addresses a problem we found where parsing after a SetTitleAndIconName was not correct.
+        "\x1b]0;python\x07\x1b[?25h",
+        [
+            SetTitleAndIconName((), {"title": "python", "name": "python"}, text="\x1b]0;python\x07"),
+            SetMode(parameters=(25,), keywords={"private": True}, text="\x1b[?25h"),
+        ]
+    ),
+    (
+        "\x1b[?25h",
+        [
+            SetMode(parameters=(25,), keywords={"private": True}, text="\x1b[?25h"),
+        ]
+    ),
+
+
 )
 
 

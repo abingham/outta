@@ -131,24 +131,31 @@ class Parser:
         Returns:
             An iterable of Element's.
         """
+        send = self._send_to_parser
+        match_text = self._text_pattern.match
+        taking_plain_text = self._taking_plain_text
+
         length = len(data)
         offset = 0
+
         while offset < length:
-            if self._taking_plain_text:
-                match = self._text_pattern.match(data, offset)
+            if taking_plain_text:
+                match = match_text(data, offset)
                 if match:
                     start, offset = match.span()
                     yield elements.Text((), {}, data[start:offset])
                 else:
-                    self._taking_plain_text = False
+                    taking_plain_text = False
                     self._buffer = ""
             else:
                 self._buffer += data[offset]
-                result = self._send_to_parser(data[offset])
+                result = send(data[offset])
                 if result is not None:
                     yield result[0](result[1], result[2], self._buffer)
-                    self._taking_plain_text = True
+                    taking_plain_text = True
                 offset += 1
+
+        self._taking_plain_text = taking_plain_text
 
     def _send_to_parser(self, data):
         try:
@@ -312,11 +319,11 @@ class Parser:
 
                 param = param[1:]  # Drop the ;.
                 if code == "0":
-                    yield elements.SetTitleAndIconName, (), {"name": param, "title": param}
+                    result = elements.SetTitleAndIconName, (), {"name": param, "title": param}
                 elif code == "1":
-                    yield elements.SetIconName, (), {"name": param}
+                    result = elements.SetIconName, (), {"name": param}
                 elif code == "2":
-                    yield elements.SetTitle, (), {"title": param}
+                    result = elements.SetTitle, (), {"title": param}
             elif char not in NUL_OR_DEL:
                 result = elements.Text, char, {}
 
