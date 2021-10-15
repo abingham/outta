@@ -9,6 +9,8 @@ These are the copyrights for the pyte work:
     :copyright: (c) 2012-2017 by pyte authors and contributors,
                     see AUTHORS for details.
     :license: LGPL, see LICENSE for more details.
+
+Also, this is beautiful: https://terminalguide.namepad.de/seq/
 """
 
 from __future__ import absolute_import, unicode_literals
@@ -93,6 +95,13 @@ class Parser:
         esc.DSR: elements.ReportDeviceStatus,
         esc.DECSTBM: elements.SetMargins,
         esc.HPA: elements.CursorToColumn,
+    }
+
+    #: "select charset" -- ``ESC % <code>``
+    percent = {
+        '8': elements.EnableUTF8Mode,
+        'G': elements.EnableUTF8Mode,
+        '@': elements.DisableUTF8Mode,
     }
 
     #: A regular expression pattern matching everything what can be
@@ -199,6 +208,7 @@ class Parser:
         sharp_dispatch = create_dispatcher(self.sharp)
         escape_dispatch = create_dispatcher(self.escape)
         csi_dispatch = create_dispatcher(self.csi)
+        percent_dispatch = create_dispatcher(self.percent)
 
         sequence_buffer = ""
         result = None
@@ -229,7 +239,7 @@ class Parser:
                     if char == "#":
                         result = sharp_dispatch[(yield)], (), {}
                     elif char == "%":
-                        self.select_other_charset((yield))
+                        result = percent_dispatch[(yield)], (), {}
                     elif char in "()":
                         code = yield
                         if self.use_utf8:
@@ -326,22 +336,3 @@ class Parser:
                     result = elements.SetTitle, (), {"title": param}
             elif char not in NUL_OR_DEL:
                 result = elements.Text, char, {}
-
-    # def select_other_charset(self, code):
-    #     """Select other (non G0 or G1) charset.
-
-    #     :param str code: character set code, should be a character from
-    #                      ``"@G8"``, otherwise ignored.
-
-    #     .. note:: We currently follow ``"linux"`` and only use this
-    #               command to switch from ISO-8859-1 to UTF-8 and back.
-
-    #     .. versionadded:: 0.6.0
-
-    #     .. seealso::
-
-    #        `Standard ECMA-35, Section 15.4 \
-    #        <http://ecma-international.org/publications/standards/Ecma-035.htm>`_
-    #        for a description of VTXXX character set machinery.
-    #     """
-    #     # A noop since all input is Unicode-only.

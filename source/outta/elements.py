@@ -268,6 +268,14 @@ class Tab(Element):
     pass
 
 
+class EnableUTF8Mode(Element):
+    pass
+
+
+class DisableUTF8Mode(Element):
+    pass
+
+
 class Text(Element):
     def __str__(self):
         return self.text
