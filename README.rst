@@ -21,7 +21,7 @@ Here's a quick example:
   
   # Construct a Parser and feed the text in.
   parser = Parser()
-  elements = list(parser.feed(text))
+  elements = tuple(parser.feed(text))
   
   # Print each of the elements
   for element in elements:
