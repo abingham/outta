@@ -35,9 +35,9 @@ setup(
         "test": ["pytest"],
     },
     entry_points={
-        # 'console_scripts': [
-        #    'outta = outta.cli:main',
-        # ],
+        'console_scripts': [
+           'outta = outta.cli:main',
+        ],
     },
     long_description=Path("README.rst").read_text(encoding="utf-8"),
 )
