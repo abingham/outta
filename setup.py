@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="outta",
-    version="0.3.0",
+    version="0.3.1",
     packages=find_packages("source"),
     author="Austin Bingham",
     author_email="austin.bingham@protonmail.com",
